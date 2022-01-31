@@ -1,4 +1,4 @@
-export IMG_NAME=ur_gateway
+export IMG_NAME=
 export RELEASE=buster
 export DEPLOY_ZIP=1
 export LOCALE_DEFAULT="de_DE.UTF-8"
@@ -13,3 +13,6 @@ export ENABLE_SSH=1
 export WPA_ESSID=""
 export WPA_PASSWORD=
 export WPA_COUNTRY=IT
+export AVAHI_HOST_NAME=
+export AVAHI_ALLOW_INTERFACES=
+export AVAHI_DENY_INTERFACES=

@@ -34,3 +34,27 @@ else
     echo 1 > "${ROOTFS_DIR}/var/lib/systemd/rfkill/platform-3f300000.mmcnr:wlan"
     echo 1 > "${ROOTFS_DIR}/var/lib/systemd/rfkill/platform-fe300000.mmcnr:wlan"
 fi
+
+if [ -f "${ROOTFS_DIR}/etc/avahi/avahi-daemon.conf" ]; then
+cat > "${ROOTFS_DIR}/etc/avahi/avahi-daemon.conf" << EOL
+[server]
+host-name=${AVAHI_HOST_NAME}
+use-ipv4=yes
+use-ipv6=yes
+allow-interfaces=${AVAHI_ALLOW_INTERFACES}
+deny-interfaces=${AVAHI_DENY_INTERFACES}
+ratelimit-interval-usec=1000000
+ratelimit-burst=1000
+
+[wide-area]
+enable-wide-area=yes
+
+[publish]
+publish-hinfo=no
+publish-workstation=no
+
+[reflector]
+
+[rlimits]
+EOL
+fi
