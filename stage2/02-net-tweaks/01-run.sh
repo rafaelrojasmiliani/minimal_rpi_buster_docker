@@ -58,3 +58,17 @@ publish-workstation=no
 [rlimits]
 EOL
 fi
+if ${WLAN_HAS_STATIC_IP}; then
+cat >> "${ROOTFS_DIR}/etc/dhcpcd.conf" << EOL
+interface wlan0
+static ip_address=${WLAN_STATIC_IP}
+static routers=${WLAN_STATIC_IP_GATEWAY}
+EOL
+fi
+if ${ETH_HAS_STATIC_IP}; then
+cat >> "${ROOTFS_DIR}/etc/dhcpcd.conf" << EOL
+interface eth0
+static ip_address=${ETH_STATIC_IP}
+static routers=${ETH_STATIC_IP_GATEWAY}
+EOL
+fi
