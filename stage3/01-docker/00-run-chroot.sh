@@ -12,7 +12,7 @@ main(){
     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends -o \
         Dpkg::Options::="--force-confnew" \
         tshark dhcp-helper parprouted
-    #yes | docker plugin install ghcr.io/devplayer0/docker-net-dhcp:release-linux-arm-v7
+    git clone https://github.com/devplayer0/docker-net-dhcp.git /opt/docker-net-dhcp
  echo "pwd= "$(pwd)
  echo "ls= "$(ls /)
  echo "ls= "$(ls /home)
@@ -33,7 +33,7 @@ Type=forking
 ExecStartPre=/bin/bash -c "ip link add brwifi type bridge"
 ExecStartPre=/bin/bash -c "ip link set wlan0 promisc on"
 ExecStartPre=/bin/bash -c "ip link set dev brwifi up"
-ExecStartPre=/bin/bash -c "ip addr add $(ip --brief a l wlan0 | awk '{print $3}' | sed 's/...$//')/32 dev brwifi"
+ExecStartPre=/bin/bash -c "ip addr add \$(ip --brief a l wlan0 | awk '{print \$3}' | sed 's/...$//')/32 dev brwifi"
 ExecStartPre=/bin/bash -c "iptables -A FORWARD -i brwifi  -j ACCEPT"
 ExecStart=/bin/bash -c "/usr/sbin/parprouted brwifi wlan0"
 ExecStopPost=/bin/bash -c "ip link set wlan0 promisc off"

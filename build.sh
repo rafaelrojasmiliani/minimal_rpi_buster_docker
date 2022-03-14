@@ -1,5 +1,6 @@
 #!/bin/bash -e
 # shellcheck disable=SC2119
+CLEAR=1
 run_sub_stage()
 {
 	log "Begin ${SUB_STAGE_DIR}"
@@ -397,3 +398,7 @@ if [ "${USE_QCOW2}" = "1" ]; then
 fi
 
 log "End ${BASE_DIR}"
+touch stage0/SKIP
+touch stage1/SKIP
+touch stage2/SKIP
+echo "Done! Your image(s) should be in deploy/"
