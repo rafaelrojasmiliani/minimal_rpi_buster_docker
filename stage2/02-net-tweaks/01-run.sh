@@ -74,32 +74,45 @@ static routers=${ETH_STATIC_IP_GATEWAY}
 EOL
 fi
 
-cat > "${ROOTFS_DIR}/etc/default/dhcp-helper" <EOF
+cat > "${ROOTFS_DIR}/etc/default/dhcp-helper" << EOF
 DHCPHELPER_OPTS="-s 255.255.255.255"
 EOF
+systemctl enable dhcp-helper.service
 
-cat  > "${ROOTFS_DIR}/etc/systemd/system/parprouted.service" <EOF
+echo "net.ipv4.ip_forward=1" > "${ROOTFS_DIR}/etc/sysctl.conf" 
+
+cat  > "${ROOTFS_DIR}/etc/systemd/system/wifibridge.service" << EOF
 [Unit]
-Description=proxy arp routing service
+Description=proxy arp routing service for wifi bridge
 Documentation=https://raspberrypi.stackexchange.com/q/88954/79866
+After=network.target
 [Service]
 Type=forking
-# Restart until wlan0 gained carrier
-Restart=on-failure
-RestartSec=5
-TimeoutStartSec=30
-ExecStartPre=/lib/systemd/systemd-networkd-wait-online --interface=wlan0 --timeout=6 --quiet
-ExecStartPre=/bin/echo 'systemd-networkd-wait-online: wlan0 is online'
-ExecStartPre=/bin/bash -c "/sbin/ip link add br0 type bridge"
-ExecStartPre=/bin/bash -c "/sbin/iptables -A FORWARD -i br0  -j ACCEPT"
-ExecStartPre=/bin/bash -c "/sbin/ip addr add $(ip --brief a l wlan0 | awk '{print $3}' | sed 's/...$//')/32 dev br0"
-ExecStartPre=/sbin/ip link set dev br0 up
-ExecStartPre=/sbin/ip link set wlan0 promisc on
-ExecStart=-/usr/sbin/parprouted br0 wlan0
-ExecStopPost=/sbin/ip link set wlan0 promisc off
-ExecStopPost=/sbin/ip link set dev br0 down
-ExecStartPre=/bin/bash -c "/sbin/ip link del br0"
+ExecStartPre=/bin/bash -c "ip link add brwifi type bridge"
+ExecStartPre=/bin/bash -c "ip link set wlan0 promisc on"
+ExecStartPre=/bin/bash -c "ip link set dev brwifi up"
+ExecStartPre=/bin/bash -c "ip addr add $(ip --brief a l wlan0 | awk '{print $3}' | sed 's/...$//')/32 dev brwifi"
+ExecStartPre=/bin/bash -c "iptables -A FORWARD -i brwifi  -j ACCEPT"
+ExecStart=/bin/bash -c "/usr/sbin/parprouted brwifi wlan0"
+ExecStopPost=/bin/bash -c "ip link set wlan0 promisc off"
+ExecStopPost=/bin/bash -c "ip link set dev brwifi down"
+ExecStopPost=/bin/bash -c "ip link del dev brwifi"
 [Install]
-WantedBy=wpa_supplicant@wlan0.service
+WantedBy=multi-user.target
 EOF
 
+systemctl enable wifibridge.service
+
+
+cat  > "${ROOTFS_DIR}/etc/systemd/system/ethbridge.service" << EOF
+[Unit]
+Description=Eth0 Bridge
+After=network.target
+[Service]
+Type=oneshot
+ExecStart=/bin/bash -c "ip link add breth type bridge; ip link set breth up; ip link set eth0 promisc on; ip link set eth0 master breth; iptables -A FORWARD -i breth -j ACCEPT"
+[Install]
+WantedBy=multi-user.target
+EOF
+
+systemctl enable ethbridge.service
