@@ -8,3 +8,5 @@ firmware-realtek
 raspberrypi-net-mods
 dhcpcd5
 net-tools
+dhcp-helper
+parprouted
