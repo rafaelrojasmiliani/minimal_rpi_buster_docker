@@ -13,9 +13,9 @@ main(){
         Dpkg::Options::="--force-confnew" \
         tshark dhcp-helper parprouted
     git clone https://github.com/devplayer0/docker-net-dhcp.git /opt/docker-net-dhcp
- echo "pwd= "$(pwd)
- echo "ls= "$(ls /)
- echo "ls= "$(ls /home)
+ 
+
+
 cat > "/etc/default/dhcp-helper" << EOF
 DHCPHELPER_OPTS="-s 255.255.255.255"
 EOF

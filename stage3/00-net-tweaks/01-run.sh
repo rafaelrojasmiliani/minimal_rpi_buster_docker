@@ -29,8 +29,6 @@ cat > "${ROOTFS_DIR}/etc/avahi/avahi-daemon.conf" << EOL
 host-name=${AVAHI_HOST_NAME}
 use-ipv4=yes
 use-ipv6=yes
-allow-interfaces=${AVAHI_ALLOW_INTERFACES}
-deny-interfaces=${AVAHI_DENY_INTERFACES}
 ratelimit-interval-usec=1000000
 ratelimit-burst=1000
 
